@@ -81,91 +81,166 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-img = cv2.imread('parrot.jpg', cv2.IMREAD_GRAYSCALE)
+img_gray = cv2.imread('scenery.jpeg', cv2.IMREAD_GRAYSCALE)
 
-plt.imshow(img, cmap='gray')
-plt.title('Original Image')
-plt.show()
+if img_gray is None:
+    print("Image not found")
+else:
+    plt.imshow(img_gray, cmap='gray')
+    plt.title('Original Grayscale Image')
+    plt.axis('off')
+    plt.show()
 ```
+
+<img width="568" height="497" alt="image" src="https://github.com/user-attachments/assets/90345a99-7dd0-4929-96d9-d115b43b7dba" />
+
 ## 2. Plot the histogram of the grayscale image.
 ```
-plt.hist(img.ravel(), 256, range=[0,256])
-plt.title('Original Image Histogram')
+plt.hist(img_gray.ravel(), bins=256, range=[0, 256], color='gray')
+plt.title('Histogram of Original Grayscale Image')
+plt.xlabel('Pixel Intensity')
+plt.ylabel('Frequency')
 plt.show()
 ```
+<img width="748" height="558" alt="image" src="https://github.com/user-attachments/assets/18a3a0b4-b70f-4e27-a048-cbdccda10ea2" />
+
 ## 3. Apply histogram equalization.
 ```
-img_eq = cv2.equalizeHist(img)
+equalized_gray = cv2.equalizeHist(img_gray)
 ```
 ## 4. Display the histogram of the equalized image.
 ```
-plt.hist(img_eq.ravel(), 256, range=[0,256])
-plt.title('Equalized Histogram')
+plt.hist(equalized_gray.ravel(), bins=256, range=[0, 256], color='gray')
+plt.title('Histogram of Equalized Grayscale Image')
+plt.xlabel('Pixel Intensity')
+plt.ylabel('Frequency')
 plt.show()
 ```
+<img width="793" height="558" alt="image" src="https://github.com/user-attachments/assets/58aae172-c19c-4428-b144-ead554826414" />
+
 ## 5. Display the equalized grayscale image.
 ```
-plt.imshow(img_eq, cmap='gray')
-plt.title('Equalized Image')
+plt.imshow(equalized_gray, cmap='gray')
+plt.title('Equalized Grayscale Image')
+plt.axis('off')
 plt.show()
 ```
+<img width="580" height="501" alt="image" src="https://github.com/user-attachments/assets/a81882dc-efed-4775-a513-fa9635104d17" />
+
 ## 6. Read the image in color mode and convert to HSV.
 ```
-img = cv2.imread('gta.jpg', cv2.IMREAD_COLOR)
-img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+img_color = cv2.imread('scenery.jpeg')
+
+if img_color is None:
+    print("Image not found")
+else:
+    img_rgb = cv2.cvtColor(img_color, cv2.COLOR_BGR2RGB)
+    img_hsv = cv2.cvtColor(img_color, cv2.COLOR_BGR2HSV)
+
+    b, g, r = cv2.split(img_color)
+
+    plt.figure(figsize=(10, 4))
+    plt.hist(b.ravel(), bins=256, range=[0, 256], color='blue', alpha=0.5)
+    plt.hist(g.ravel(), bins=256, range=[0, 256], color='green', alpha=0.5)
+    plt.hist(r.ravel(), bins=256, range=[0, 256], color='red', alpha=0.5)
+    plt.title('Histogram of B, G, R Channels')
+    plt.xlabel('Pixel Intensity')
+    plt.ylabel('Frequency')
+    plt.show()
 ```
+<img width="1161" height="481" alt="image" src="https://github.com/user-attachments/assets/93c05ffa-4682-4bbd-a030-784276e7e883" />
+
 ## 7. Apply histogram equalization to the V channel.
 ```
-img_hsv[:, :, 2] = cv2.equalizeHist(img_hsv[:, :, 2])
+h, s, v = cv2.split(img_hsv)
+
+v_equalized = cv2.equalizeHist(v)
+
+img_hsv_equalized = cv2.merge((h, s, v_equalized))
 ```
 ## 8. Convert the enhanced HSV image back to BGR.
 ```
-img_eq = cv2.cvtColor(img_hsv, cv2.COLOR_HSV2BGR)
+equalized_color = cv2.cvtColor(
+    img_hsv_equalized, cv2.COLOR_HSV2BGR
+)
+
+equalized_rgb = cv2.cvtColor(
+    equalized_color, cv2.COLOR_BGR2RGB
+)
 ```
 ## 9. Display the original and equalized color images.
 ```
-plt.subplot(121)
-plt.imshow(img[:, :, ::-1])
+plt.figure(figsize=(10, 5))
+
+plt.subplot(1, 2, 1)
+plt.imshow(img_rgb)
 plt.title('Original Color Image')
+plt.axis('off')
 
-plt.subplot(122)
-plt.imshow(img_eq[:, :, ::-1])
-plt.title('Equalized Image')
+plt.subplot(1, 2, 2)
+plt.imshow(equalized_rgb)
+plt.title('Equalized Color Image')
+plt.axis('off')
 
+plt.tight_layout()
 plt.show()
 ```
+<img width="1237" height="542" alt="image" src="https://github.com/user-attachments/assets/417d6a79-9b78-44c9-840e-fa8564cb93af" />
+
 ## 10. Display the original and equalized images along with their histograms.
 ```
-plt.figure(figsize=[12,10])
+plt.figure(figsize=(12, 10))
 
-plt.subplot(221)
-plt.imshow(img[:, :, ::-1])
+plt.subplot(2, 2, 1)
+plt.imshow(img_gray, cmap='gray')
+plt.title('Original Grayscale Image')
+plt.axis('off')
+
+plt.subplot(2, 2, 2)
+plt.hist(img_gray.ravel(), bins=256, range=[0, 256], color='gray')
+plt.title('Original Grayscale Histogram')
+
+plt.subplot(2, 2, 3)
+plt.imshow(equalized_gray, cmap='gray')
+plt.title('Equalized Grayscale Image')
+plt.axis('off')
+
+plt.subplot(2, 2, 4)
+plt.hist(equalized_gray.ravel(), bins=256, range=[0, 256], color='gray')
+plt.title('Equalized Grayscale Histogram')
+
+plt.tight_layout()
+plt.show()
+
+plt.figure(figsize=(12, 8))
+
+plt.subplot(2, 2, 1)
+plt.imshow(img_rgb)
 plt.title('Original Color Image')
+plt.axis('off')
 
-plt.subplot(222)
-plt.imshow(img_eq[:, :, ::-1])
-plt.title('Equalized Image')
+plt.subplot(2, 2, 2)
+for channel, color in zip(cv2.split(img_color), ['blue', 'green', 'red']):
+    plt.hist(channel.ravel(), bins=256, range=[0, 256],
+             color=color, alpha=0.4)
+plt.title('Original BGR Histogram')
 
-plt.subplot(223)
-plt.hist(img.ravel(), 256, range=[0,256])
-plt.title('Original Histogram')
+plt.subplot(2, 2, 3)
+plt.imshow(equalized_rgb)
+plt.title('Equalized Color Image')
+plt.axis('off')
 
-plt.subplot(224)
-plt.hist(img_eq.ravel(), 256, range=[0,256])
-plt.title('Histogram Equalized')
+plt.subplot(2, 2, 4)
+for channel, color in zip(cv2.split(equalized_color), ['blue', 'green', 'red']):
+    plt.hist(channel.ravel(), bins=256, range=[0, 256],
+             color=color, alpha=0.4)
+plt.title('Equalized BGR Histogram')
 
+plt.tight_layout()
 plt.show()
 ```
----
-
-##  Output
-
-<img width="735" height="485" alt="image" src="https://github.com/user-attachments/assets/8b1a5a72-eee6-4cf9-bd32-0b9a18ad17b8" />
-<img width="756" height="541" alt="image" src="https://github.com/user-attachments/assets/4d51e78b-efc2-4a1c-89de-feeff5c7b071" />
-<img width="743" height="534" alt="image" src="https://github.com/user-attachments/assets/05d8714c-5700-493b-9935-6cc93f69253e" />
-<img width="708" height="501" alt="image" src="https://github.com/user-attachments/assets/f3cb6958-41ff-4116-95c3-15e7d24ac967" />
-<img width="765" height="271" alt="image" src="https://github.com/user-attachments/assets/d0824405-de44-4640-b7a5-1e771c0209c2" />
-<img width="883" height="707" alt="image" src="https://github.com/user-attachments/assets/da79d3ef-8b5b-4f8c-85c9-8eed13f56229" />
+<img width="902" height="755" alt="image" src="https://github.com/user-attachments/assets/d9ed1958-b5fd-40fb-981b-acf5b72d443a" />
+<img width="911" height="657" alt="image" src="https://github.com/user-attachments/assets/8f6dc15f-f863-4612-bea3-d7fb65052772" />
 
 ### Grayscale Histogram Equalization
 
